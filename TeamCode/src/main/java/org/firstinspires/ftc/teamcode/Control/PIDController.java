@@ -4,6 +4,7 @@ public class PIDController implements Constants{
     private double i=0;
     private double d;
     private double error;
+    private double target;
     private double power;
     private double KP;
     private double KI;
@@ -31,6 +32,7 @@ public class PIDController implements Constants{
     }
 
     public double power(double target, double currentLoc){
+        this.target = target;
         double error = target - currentLoc;
         this.error = error;
         double deltaTime = (System.nanoTime() - previousTime)/NANOSECS_PER_MIN;
@@ -64,12 +66,21 @@ public class PIDController implements Constants{
 
     public double getError(){return Math.abs(error);}
 
+    public void setTarget(double target){this.target = target;}
+
+    public double getTarget(){return target;}
 
     public void setKP(double KP){this.KP = KP;}
 
     public void setKI(double KI){this.KI = KI;}
 
     public void setKD(double KD){this.KD = KD;}
+
+    public void setPID(double kp, double ki, double kd){
+        setKP(kp);
+        setKI(ki);
+        setKD(kd);
+    }
 
     public void reset(){
         i = 0;

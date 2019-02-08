@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Hardware.Hardware;
 
-@Disabled
 @TeleOp(name = "Mech Teleop")
 public class MechTeleop extends OpMode {
     private Hardware robot = new Hardware();

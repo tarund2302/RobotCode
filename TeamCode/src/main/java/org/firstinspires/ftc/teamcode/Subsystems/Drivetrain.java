@@ -30,9 +30,10 @@ public class Drivetrain implements Constants {
     private double angle;
     private double fieldCentric;
     private double desiredAngle;
+    private double desiredPitch;
     private double speeds[];
 
-    PIDController distanceDrive = new PIDController(distanceKP,distanceKI,distanceKD,distanceMaxI);
+    public PIDController distanceDrive = new PIDController(distanceKP,distanceKI,distanceKD,distanceMaxI);
     PIDController turnAngle =new PIDController(turnBigKP,turnBigKI,turnBigKD,turnBigMaxI);
     PIDController smallTurnAngle = new PIDController(turnKP, turnKI, turnKD,turnMaxI);
     PIDController testTurn = new PIDController(testTurnKP,testTurnKI,testTurnKD, testTurnMaxI);
@@ -41,6 +42,7 @@ public class Drivetrain implements Constants {
     PIDController turnSide = new PIDController(sideKP, sideKI, sideKD, sideMaxI);
     PIDController bigTurnSide = new PIDController(bigSideKP, bigSideKI, bigSideKD, sideMaxI);
     PIDController angularCorrection = new PIDController(angleCorrectionKP,angleCorrectionKI,angleCorrectionKD, angleCorrectionMaxI);
+    PIDController pitchCorrection = new PIDController(/*kp,ki,kd,1*/0.001,0,0,1);
 
     public double frontLeftData;
     public double frontRightData;
@@ -59,6 +61,33 @@ public class Drivetrain implements Constants {
 
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
+    }
+
+    public void yes(Gamepad gamepad, boolean idc){
+        double DESIIRED_PITCH = 0;
+
+        double yDirection = gamepad.left_stick_y;
+        double xDirection = gamepad.right_stick_x;
+
+        double antiTipPower = pitchCorrection.power(DESIIRED_PITCH, imu.getPitch());
+
+        double leftPower = (yDirection-xDirection)*(SPEED_MULTIPLIER);
+        double rightPower = (-yDirection-xDirection)*(SPEED_MULTIPLIER);
+        if(!idc){
+            hardware.backLeft.setPower(leftPower);
+            hardware.frontLeft.setPower(leftPower);
+            hardware.backRight.setPower(rightPower);
+            hardware.frontRight.setPower(rightPower);
+        }
+        else{
+            hardware.backLeft.setPower(leftPower + antiTipPower);
+            hardware.frontLeft.setPower(leftPower + antiTipPower);
+            hardware.backRight.setPower(rightPower + antiTipPower);
+            hardware.frontRight.setPower(rightPower + antiTipPower);
+
+        }
+
+
     }
 
     public void leftDrive(double power){
@@ -203,6 +232,9 @@ public class Drivetrain implements Constants {
         stop();
     }
 
+    public void driveForward(double distance){
+        drive(distance,Direction.FORWARD);
+    }
     public void rotate(double speed, Direction direction){
         speed *= direction.value;
         drive(-speed,speed);
@@ -219,11 +251,11 @@ public class Drivetrain implements Constants {
         stop();
     }
 
-    public void turn(double degrees, Direction direction){
+    public void turn(double angle, Direction direction){
         long startTime = System.nanoTime();
         long stopState = 0;
-        degrees *= direction.value;
-        double target = imu.getRelativeYaw() + degrees;
+        angle *= direction.value;
+        double target = imu.getRelativeYaw() + angle;
 
         while(opModeActive() && (stopState <= 1000)){
             double position = imu.getRelativeYaw();
@@ -300,7 +332,7 @@ public class Drivetrain implements Constants {
             }
 
             stopState = Math.abs(position - degrees) <= IMU_TOLERANCE ?
-                    stopState = (System.nanoTime() - startTime) / NANOSECS_PER_MILISEC :
+                    (System.nanoTime() - startTime) / NANOSECS_PER_MILISEC :
                     startTime;
 
             if(startTime/NANOSECS_PER_MILISEC >= 5000) break;
@@ -309,10 +341,10 @@ public class Drivetrain implements Constants {
     }
     public void testAngleCorrection(){
         double initialHeading = imu.getRelativeYaw();
-        long startTime = System.nanoTime();
-        long stopState = 0;
+        //long startTime = System.nanoTime();
+        //long stopState = 0;
 
-        while(opModeActive() && (stopState <= 1500)){
+        while(opModeActive()/* && (stopState <= 1500)*/){
             double angleCorrectionPower = angularCorrection.power(initialHeading,imu.getRelativeYaw());
 
             telemetry.addData("Power:",angleCorrectionPower);
@@ -323,12 +355,12 @@ public class Drivetrain implements Constants {
             leftDrive(-angleCorrectionPower);
             rightDrive(angleCorrectionPower);
 
-            if(Math.abs(imu.getRelativeYaw() - initialHeading) <= IMU_TOLERANCE){
+/*            if(Math.abs(imu.getRelativeYaw() - initialHeading) <= IMU_TOLERANCE){
                 stopState = (System.nanoTime() - startTime) / NANOSECS_PER_MILISEC;
             }
             else{
                 startTime = System.nanoTime();
-            }
+            }*/
         }
         //stop();
     }

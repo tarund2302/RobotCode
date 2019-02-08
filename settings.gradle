@@ -1,2 +1,6 @@
-include ':FtcRobotController'
+include ':FtcRobotController', ':lib', ':mylibrary', ':maelstromLibrary'
+include ':MaelstromLibrary'
+include ':openCVLibrary3'
+include ':DogeCV'
 include ':TeamCode'
+

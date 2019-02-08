@@ -35,6 +35,11 @@ public interface Constants {
     double RANGE_DISTANCE_TOLERANCE = 0.1;
     double HANG_TOLERANCE = 10;
 
+    double ENCODER_TOLERANCE = 50;
+    double PIVOT_TICKS_PER_ROTATION = 100;
+    double PIVOT_TICKS_PER_INCH = 100;
+
+
     double AUTO_RAISE_POSITION = 800;
     double AUTO_LOWER_POSITION = 0;
 
@@ -117,6 +122,11 @@ public interface Constants {
     double climberKI = 0;
     double climberKD = 0;
     double climberMaxI = 0;
+
+    double pivotKP = 1e-6;
+    double pivotKI = 0;
+    double pivotKD = 0;
+    double pivotMaxI = 1;
 
     int ALIGN_POSITION = -100;
 
