@@ -37,8 +37,8 @@ public class Pivot implements Constants {
     Hardware hardware;
     //Robot robot;
     public MaelstromMotorSystem pivot;
-
     public Pivot(HardwareMap hwMap){
+
         //pivot = new MaelstromMotorSystem("pivot1","pivot2", MotorModel.NEVEREST60, hwMap);
         pivot = new MaelstromMotorSystem("pivot1","pivot2", "Pivot", DcMotorSimple.Direction.FORWARD, hwMap, MotorModel.NEVEREST60);
         pivot.stopAndReset();

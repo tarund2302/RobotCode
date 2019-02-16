@@ -23,6 +23,7 @@ public class Robot extends MaelstromRobot implements Constants {
         imu = new MaelstromIMU("imu",hwMap);
         dt = new MaelstromDrivetrain(DrivetrainModels.ARCADE,2.0,dtKP,dtKI,dtKD,hwMap, MotorModel.NEVEREST40);
         goldfind = new GoldDetector(this);
+        feed = feed.getFeed();
     }
 
     @Override

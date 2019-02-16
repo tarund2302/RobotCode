@@ -80,8 +80,8 @@ public class Drivetrain implements Constants {
             hardware.frontRight.setPower(rightPower);
         }
         else{
-            hardware.backLeft.setPower(leftPower + antiTipPower);
-            hardware.frontLeft.setPower(leftPower + antiTipPower);
+            hardware.backLeft.setPower(leftPower - antiTipPower);
+            hardware.frontLeft.setPower(leftPower - antiTipPower);
             hardware.backRight.setPower(rightPower + antiTipPower);
             hardware.frontRight.setPower(rightPower + antiTipPower);
 
@@ -118,6 +118,42 @@ public class Drivetrain implements Constants {
         double right = yDirection + xDirection;
 
         drive(left,right);
+    }
+
+    public void fieldCentric(Gamepad controller){
+
+        double leftY = controller.left_stick_y;
+        double leftX = controller.left_stick_x;
+        double rightX = controller.right_stick_x;
+
+        double x = -leftY;
+        double y = leftX;
+
+        double angle = Math.atan2(y,x);
+        double fieldCentric = angle - Math.toRadians(imu.getYaw());
+        double adjustedAngle = fieldCentric + Math.PI / 4;
+
+        this.angle = angle;
+        this.fieldCentric = fieldCentric;
+
+        double speedMagnitude = Math.hypot(x,y);
+
+        if(Math.abs(rightX) > 0.00001) desiredAngle = imu.getRelativeYaw();
+
+        double speeds[] = {Math.sin(adjustedAngle), Math.cos(adjustedAngle), Math.cos(adjustedAngle), Math.sin(adjustedAngle)};
+
+        speeds[0] = (speeds[0] * speedMagnitude) - rightX * speedMagnitude;
+        speeds[1] = (speeds[1] * speedMagnitude) - rightX * speedMagnitude;
+        speeds[2] = (speeds[2] * speedMagnitude) + rightX * speedMagnitude;
+        speeds[3] = (speeds[3] * speedMagnitude) + rightX * speedMagnitude;
+        this.speeds = speeds;
+
+        frontLeft.setPower(speeds[0]);
+        backLeft.setPower(speeds[1]);
+        frontRight.setPower(speeds[2]);
+        backRight.setPower(speeds[3]);
+
+        if(controller.left_stick_button && controller.right_stick_button) imu.resetAngle();
     }
 
     public void mecanum(Gamepad controller){

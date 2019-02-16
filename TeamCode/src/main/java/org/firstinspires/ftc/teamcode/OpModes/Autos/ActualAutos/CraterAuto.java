@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.Hardware.Hardware;
 import org.firstinspires.ftc.teamcode.Utils.Direction;
 
 @Autonomous(name = "CraterAuto")
-public class CraterAuto extends LinearOpMode implements Constants,AutonomousOpMode {
+public class CraterAuto extends LinearOpMode implements Constants,AutonomousOpMode, Runnable {
     private double sampleTurn;
     private double sampleDistance;
     private double wallTurn;
@@ -63,6 +63,10 @@ public class CraterAuto extends LinearOpMode implements Constants,AutonomousOpMo
         robot.dt.driveForward(sampleDistance);
         robot.dt.drive(5,Direction.BACKWARD);
         robot.dt.turn(wallTurn,Direction.LEFT);
+
+        Thread extender = new Thread();
+        extender.start();
+
         robot.dt.driveForward(wallDistance);
         robot.dt.turn(30,Direction.LEFT);
         robot.dt.driveForward(65);
@@ -75,5 +79,10 @@ public class CraterAuto extends LinearOpMode implements Constants,AutonomousOpMo
     }
     public Telemetry getTelemetry() {
         return telemetry;
+    }
+
+    @Override
+    public void run() {
+
     }
 }

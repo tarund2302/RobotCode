@@ -18,6 +18,7 @@ public class MechTeleop extends OpMode {
 
     @Override
     public void loop() {
-        robot.dt.mecanum(gamepad1);
+        //robot.dt.mecanum(gamepad1);
+        robot.dt.fieldCentric(gamepad1);
     }
 }
